@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import type { QuizSession, GenreKey } from "@/types/quiz"
-import { generateQuizSession, calculateQuizResults } from "@/lib/quiz-data"
+import { calculateQuizResults } from "@/lib/quiz-data"
 import { QuestionDisplay } from "@/components/quiz/question-display"
 import { QuizProgress } from "@/components/quiz/quiz-progress"
 import { QuizNavigation } from "@/components/quiz/quiz-navigation"
@@ -16,21 +16,52 @@ export default function QuizPage() {
   const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null)
   const [showExplanation, setShowExplanation] = useState(false)
   const [isQuizComplete, setIsQuizComplete] = useState(false)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const router = useRouter()
 
-  // Initialize quiz session
   useEffect(() => {
-    const selectedGenre = (localStorage.getItem("selectedGenre") as GenreKey) || "all"
-    const questions = generateQuizSession(selectedGenre)
-    const newSession: QuizSession = {
-      id: `quiz-${Date.now()}`,
-      questions,
-      currentQuestionIndex: 0,
-      answers: new Array(questions.length).fill(null),
-      score: 0,
-      startTime: new Date(),
+    const fetchQuizQuestions = async () => {
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        const selectedGenre = (localStorage.getItem("selectedGenre") as GenreKey) || "all"
+        console.log(`[Client] Fetching quiz for genre: ${selectedGenre}`)
+
+        const response = await fetch(`/api/quiz?genre=${encodeURIComponent(selectedGenre)}`)
+
+        if (!response.ok) {
+          throw new Error(`Failed to fetch quiz: ${response.status}`)
+        }
+
+        const data = await response.json()
+
+        if (!data.success) {
+          throw new Error(data.error || "Failed to generate quiz")
+        }
+
+        console.log(`[Client] Received ${data.questions.length} questions from server`)
+
+        const newSession: QuizSession = {
+          id: `quiz-${Date.now()}`,
+          questions: data.questions, // Questions are pre-sorted by server
+          currentQuestionIndex: 0,
+          answers: new Array(data.questions.length).fill(null),
+          score: 0,
+          startTime: new Date(),
+        }
+
+        setSession(newSession)
+      } catch (err) {
+        console.error("[Client] Error fetching quiz:", err)
+        setError(err instanceof Error ? err.message : "Failed to load quiz")
+      } finally {
+        setIsLoading(false)
+      }
     }
-    setSession(newSession)
+
+    fetchQuizQuestions()
   }, [])
 
   const handleAnswerSelect = (answer: string) => {
@@ -99,12 +130,47 @@ export default function QuizPage() {
     setShowExplanation(false)
   }
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card>
+          <CardContent className="p-8 text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-lg">クイズを準備中...</p>
+            <p className="text-sm text-muted-foreground mt-2">サーバーから問題を取得しています</p>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background flex items-center justify-center">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-destructive">エラーが発生しました</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-center">{error}</p>
+            <div className="flex gap-4 justify-center">
+              <Button onClick={() => window.location.reload()}>再試行</Button>
+              <Link href="/genre-selection">
+                <Button variant="outline">ジャンル選択に戻る</Button>
+              </Link>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
   if (!session) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <Card>
           <CardContent className="p-6">
-            <p className="text-center">クイズを準備中...</p>
+            <p className="text-center">セッションの初期化中...</p>
           </CardContent>
         </Card>
       </div>
