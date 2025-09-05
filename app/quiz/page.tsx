@@ -1,9 +1,7 @@
-//app>quiz>page.tsx
 "use client"
 
 import { useState, useEffect } from "react"
-import type { QuizSession, GenreKey } from "@/types/quiz"
-import { calculateQuizResults } from "@/lib/quiz-data"
+import type { QuizSession, GenreKey, QuizQuestion } from "@/types/quiz"
 import { QuestionDisplay } from "@/components/quiz/question-display"
 import { QuizProgress } from "@/components/quiz/quiz-progress"
 import { QuizNavigation } from "@/components/quiz/quiz-navigation"
@@ -11,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
+import { calculateQuizResults } from "@/lib/quiz-data"
 
 export default function QuizPage() {
   const [session, setSession] = useState<QuizSession | null>(null)
@@ -26,66 +25,53 @@ export default function QuizPage() {
       try {
         setIsLoading(true)
         setError(null)
-
         const selectedGenre = (localStorage.getItem("selectedGenre") as GenreKey) || "all"
-        console.log(`[Client] Fetching quiz for genre: ${selectedGenre}`)
-
         const response = await fetch(`/api/quiz?genre=${encodeURIComponent(selectedGenre)}`)
-
         if (!response.ok) {
-          throw new Error(`Failed to fetch quiz: ${response.status}`)
+          const errorData = await response.json();
+          throw new Error(errorData.error || `Failed to fetch quiz: ${response.status}`)
         }
-
         const data = await response.json()
-
-        if (!data.success) {
-          throw new Error(data.error || "Failed to generate quiz")
+        if (!data.success || !data.questions || data.questions.length === 0) {
+          throw new Error(data.error || "クイズの問題が見つかりませんでした。")
         }
-
-        console.log(`[Client] Received ${data.questions.length} questions from server`)
-
         const newSession: QuizSession = {
           id: `quiz-${Date.now()}`,
-          questions: data.questions, // Questions are pre-sorted by server
+          questions: data.questions,
           currentQuestionIndex: 0,
           answers: new Array(data.questions.length).fill(null),
           score: 0,
           startTime: new Date(),
         }
-
         setSession(newSession)
       } catch (err) {
-        console.error("[Client] Error fetching quiz:", err)
-        setError(err instanceof Error ? err.message : "Failed to load quiz")
+        setError(err instanceof Error ? err.message : "クイズの読み込みに失敗しました")
       } finally {
         setIsLoading(false)
       }
     }
-
     fetchQuizQuestions()
   }, [])
 
   const handleAnswerSelect = (answer: string) => {
-    setSelectedAnswer(answer)
+    if (!showExplanation) {
+      setSelectedAnswer(answer)
+    }
   }
 
   const handleAnswerSubmit = () => {
-    if (!session || selectedAnswer === null) return
-
+    if (!session || selectedAnswer === null) return;
     const updatedAnswers = [...session.answers]
     updatedAnswers[session.currentQuestionIndex] = selectedAnswer
-
     setSession({
       ...session,
       answers: updatedAnswers,
     })
-
     setShowExplanation(true)
   }
 
   const handleNextQuestion = () => {
-    if (!session) return
-
+    if (!session) return;
     if (session.currentQuestionIndex < session.questions.length - 1) {
       setSession({
         ...session,
@@ -97,108 +83,46 @@ export default function QuizPage() {
       const endTime = new Date()
       const completionTime = Math.round((endTime.getTime() - session.startTime.getTime()) / 1000)
       const results = calculateQuizResults(session.questions, session.answers, completionTime)
-
-      // Store results in localStorage for the results page
-      localStorage.setItem(
-        "quizResults",
-        JSON.stringify({
-          ...results,
-          sessionId: session.id,
-          questions: session.questions,
-          answers: session.answers,
-          startTime: session.startTime,
-          endTime,
-        }),
-      )
-
-      // Quiz complete
-      setSession({
-        ...session,
+      localStorage.setItem("quizResults", JSON.stringify({
+        ...results,
+        sessionId: session.id,
+        questions: session.questions,
+        answers: session.answers,
+        startTime: session.startTime,
         endTime,
-      })
+      }))
       setIsQuizComplete(true)
     }
   }
 
-  const handlePreviousQuestion = () => {
-    if (!session || session.currentQuestionIndex === 0) return
-
-    setSession({
-      ...session,
-      currentQuestionIndex: session.currentQuestionIndex - 1,
-    })
-    setSelectedAnswer(session.answers[session.currentQuestionIndex - 1])
-    setShowExplanation(false)
-  }
-
-  if (isLoading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card>
-          <CardContent className="p-8 text-center">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-lg">クイズを準備中...</p>
-            <p className="text-sm text-muted-foreground mt-2">サーバーから問題を取得しています</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
+  if (isLoading) { return <div className="min-h-screen bg-card flex items-center justify-center font-serif"><p className="text-lg">クイズを準備中...</p></div> }
   if (error) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-destructive">エラーが発生しました</CardTitle>
-          </CardHeader>
+      <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif">
+        <Card className="w-full max-w-md bg-background">
+          <CardHeader><CardTitle className="text-destructive">エラーが発生しました</CardTitle></CardHeader>
           <CardContent className="space-y-4">
             <p className="text-center">{error}</p>
             <div className="flex gap-4 justify-center">
               <Button onClick={() => window.location.reload()}>再試行</Button>
-              <Link href="/genre-selection">
-                <Button variant="outline">ジャンル選択に戻る</Button>
-              </Link>
+              <Link href="/genre-selection"><Button variant="outline">ジャンル選択に戻る</Button></Link>
             </div>
           </CardContent>
         </Card>
       </div>
     )
   }
-
-  if (!session) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-center">セッションの初期化中...</p>
-          </CardContent>
-        </Card>
-      </div>
-    )
-  }
-
+  if (!session) { return <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif"><p>セッションを開始できませんでした。</p></div> }
   if (isQuizComplete) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-12">
-          <div className="max-w-2xl mx-auto text-center">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-2xl text-primary">クイズ完了！</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <p className="text-lg">お疲れ様でした！全15問のクイズが完了しました。</p>
-                <div className="flex gap-4 justify-center">
-                  <Button onClick={() => router.push("/results")}>結果を見る</Button>
-                  <Link href="/">
-                    <Button variant="outline">ホームに戻る</Button>
-                  </Link>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </div>
+      <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif">
+        <Card className="w-full max-w-md text-center bg-background">
+          <CardHeader><CardTitle className="text-2xl text-primary">クイズ完了！</CardTitle></CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-lg">お疲れ様でした！</p>
+            <Button onClick={() => router.push("/results")}>結果を見る</Button>
+          </CardContent>
+        </Card>
       </div>
     )
   }
@@ -206,48 +130,42 @@ export default function QuizPage() {
   const currentQuestion = session.questions[session.currentQuestionIndex]
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <h1 className="text-xl font-bold text-foreground">日本伝統工芸品クイズ</h1>
-            <Link href="/">
-              <Button variant="outline" size="sm">
-                終了
-              </Button>
-            </Link>
-          </div>
+    <div className="min-h-screen bg-card flex flex-col font-serif">
+      {/* ★★★ 変更点：ヘッダーに終了ボタンを追加 ★★★ */}
+      <header className="py-4 px-4">
+        <div className="container mx-auto flex justify-between items-center">
+            <div className="w-1/3"></div> {/* 左側のスペース確保用 */}
+            <div className="w-1/3 text-center">
+                <h1 className="text-2xl font-bold tracking-widest text-foreground">クイズ</h1>
+            </div>
+            <div className="w-1/3 flex justify-end">
+                <Link href="/genre-selection">
+                    <Button variant="outline" size="sm">終了</Button>
+                </Link>
+            </div>
         </div>
+        <p className="text-xs text-muted-foreground text-center mt-1">正解数に応じてランクアップ！</p>
       </header>
 
-      {/* Main Quiz Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          {/* Progress */}
+      <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
+        <div className="max-w-md mx-auto w-full">
           <QuizProgress current={session.currentQuestionIndex + 1} total={session.questions.length} className="mb-8" />
-
-          {/* Question */}
-          <QuestionDisplay
-            question={currentQuestion}
-            selectedAnswer={selectedAnswer}
-            onAnswerSelect={handleAnswerSelect}
-            showExplanation={showExplanation}
-            className="mb-8"
-          />
-
-          {/* Navigation */}
+          <QuestionDisplay question={currentQuestion} selectedAnswer={selectedAnswer} onAnswerSelect={handleAnswerSelect} showExplanation={showExplanation} className="mb-8" />
           <QuizNavigation
-            canGoBack={session.currentQuestionIndex > 0}
+            canGoBack={false}
             canSubmit={selectedAnswer !== null && !showExplanation}
             canNext={showExplanation}
             isLastQuestion={session.currentQuestionIndex === session.questions.length - 1}
-            onPrevious={handlePreviousQuestion}
+            onPrevious={() => {}}
             onSubmit={handleAnswerSubmit}
             onNext={handleNextQuestion}
           />
         </div>
       </main>
+      
+      <footer className="w-full h-20 bg-repeat-x bg-bottom" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 20\'%3E%3Cpath fill=\'%23a0d8ef\' fill-opacity=\'0.3\' d=\'M0 10 Q 25 0, 50 10 T 100 10 L 100 20 L 0 20 Z\'%3E%3C/path%3E%3Cpath fill=\'%23a0d8ef\' fill-opacity=\'0.6\' d=\'M0 15 Q 25 5, 50 15 T 100 15 L 100 20 L 0 20 Z\'%3E%3C/path%3E%3C/svg%3E")'}}>
+      </footer>
     </div>
   )
 }
+

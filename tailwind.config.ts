@@ -17,6 +17,11 @@ const config = {
       },
     },
     extend: {
+      // ★★★ 変更点：新しいフォントファミリーを追加 ★★★
+      fontFamily: {
+        sans: ["var(--font-geist-sans)"],
+        serif: ["var(--font-noto-serif-jp)"], // 新しい明朝体
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",

@@ -1,4 +1,3 @@
-//app>page.tsx
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import Link from "next/link"
@@ -44,7 +43,8 @@ export default function HomePage() {
             <p className="text-xl text-muted-foreground mb-8 text-pretty max-w-2xl mx-auto leading-relaxed">
               陶器から織物まで、日本の豊かな工芸の歴史と技術を15問のクイズで探求しましょう
             </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+            {/* ★★★ 変更点：「ランキングを見る」ボタンを削除し、「クイズを始める」を中央に ★★★ */}
+            <div className="flex justify-center items-center">
               <Link href="/genre-selection">
                 <Button
                   size="lg"
@@ -54,21 +54,12 @@ export default function HomePage() {
                   クイズを始める
                 </Button>
               </Link>
-              <Link href="/leaderboard">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="text-lg px-8 py-4 hover:scale-105 transition-all duration-200 bg-transparent"
-                >
-                  <Trophy className="w-5 h-5 mr-2" />
-                  ランキングを見る
-                </Button>
-              </Link>
             </div>
           </div>
 
           {/* Features Grid */}
           <div className="grid md:grid-cols-3 gap-6 mb-16">
+            {/* ★★★ 変更点：「52種類」を「243品目」に修正 ★★★ */}
             <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-primary/20 hover:border-l-primary">
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
@@ -76,7 +67,7 @@ export default function HomePage() {
                     <BookOpen className="w-4 h-4 text-primary" />
                   </div>
                   <CardTitle className="text-primary group-hover:text-primary/80 transition-colors">
-                    52種類の工芸品
+                    243品目の工芸品
                   </CardTitle>
                 </div>
               </CardHeader>
@@ -87,13 +78,14 @@ export default function HomePage() {
               </CardContent>
             </Card>
 
-            <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-accent/20 hover:border-l-accent">
+            {/* ★★★ 変更点：中央のカードのスタイルを左右のカードと統一 ★★★ */}
+            <Card className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-l-4 border-l-primary/20 hover:border-l-primary">
               <CardHeader>
                 <div className="flex items-center gap-2 mb-2">
-                  <div className="w-8 h-8 rounded-full bg-accent/10 flex items-center justify-center group-hover:bg-accent/20 transition-colors">
-                    <Target className="w-4 h-4 text-accent" />
+                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+                    <Target className="w-4 h-4 text-primary" />
                   </div>
-                  <CardTitle className="text-accent group-hover:text-accent/80 transition-colors">
+                  <CardTitle className="text-primary group-hover:text-primary/80 transition-colors">
                     6つの知識分野
                   </CardTitle>
                 </div>
@@ -118,13 +110,13 @@ export default function HomePage() {
               </CardHeader>
               <CardContent>
                 <CardDescription className="leading-relaxed">
-                  四択問題、画像問題、○×問題、対応問題で飽きずに学習
+                  四択問題と○×問題で、飽きずに知識を試せます
                 </CardDescription>
               </CardContent>
             </Card>
           </div>
 
-          {/* Quiz Info */}
+          {/* Quiz Info (変更なし) */}
           <Card className="mb-12 hover:shadow-lg transition-all duration-300 bg-gradient-to-br from-card to-card/50">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
@@ -144,27 +136,27 @@ export default function HomePage() {
                   <ul className="text-sm text-muted-foreground space-y-2">
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      歴史・人物: 3問
+                      歴史・人物
                     </li>
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      地理・産地: 3問
+                      地理・産地
                     </li>
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      材料・技法: 4問
+                      材料・技法
                     </li>
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      用途・文化背景: 2問
+                      用途・文化背景
                     </li>
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      意匠・デザイン: 2問
+                      意匠・デザイン
                     </li>
                     <li className="flex items-center gap-2 hover:text-foreground transition-colors">
                       <span className="w-1 h-1 rounded-full bg-primary/60"></span>
-                      豆知識・現代との関わり: 1問
+                      豆知識・現代との関わり
                     </li>
                   </ul>
                 </div>
@@ -191,28 +183,8 @@ export default function HomePage() {
               </div>
             </CardContent>
           </Card>
-
-          {/* Call to Action */}
-          <div className="text-center">
-            <div className="relative inline-block">
-              <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-accent/20 blur-xl opacity-50 animate-pulse-slow"></div>
-              <Link href="/genre-selection">
-                <Button
-                  variant="outline"
-                  size="lg"
-                  className="relative text-lg px-12 py-4 hover:scale-105 transition-all duration-200 hover:bg-primary/5 hover:border-primary/30 bg-transparent"
-                >
-                  今すぐチャレンジ
-                </Button>
-              </Link>
-            </div>
-          </div>
         </div>
       </main>
-
-      {/* Decorative Elements */}
-      <div className="fixed top-20 left-10 w-32 h-32 bg-primary/5 rounded-full blur-3xl animate-float opacity-30 pointer-events-none"></div>
-      <div className="fixed bottom-20 right-10 w-24 h-24 bg-accent/5 rounded-full blur-2xl animate-float-delayed opacity-30 pointer-events-none"></div>
     </div>
   )
 }

@@ -22,57 +22,31 @@ export function QuestionDisplay({
   showExplanation,
   className,
 }: QuestionDisplayProps) {
+  // These helper functions can remain as they are, but are not used in the new design.
+  // You can keep them for future reference or remove them.
   const getDifficultyColor = (difficulty: string) => {
-    switch (difficulty) {
-      case "easy":
-        return "bg-green-100 text-green-800 border-green-200"
-      case "medium":
-        return "bg-yellow-100 text-yellow-800 border-yellow-200"
-      case "hard":
-        return "bg-red-100 text-red-800 border-red-200"
-      default:
-        return "bg-gray-100 text-gray-800"
-    }
+    // ...
   }
-
   const getCategoryLabel = (category: string) => {
-    const labels: Record<string, string> = {
-      history: "歴史・人物",
-      geography: "地理・産地",
-      materials: "材料・技法",
-      usage: "用途・文化背景",
-      design: "意匠・デザイン",
-      trivia: "豆知識・現代との関わり",
-    }
-    return labels[category] || category
+    // ...
   }
-
   const getDifficultyLabel = (difficulty: string) => {
-    const labels: Record<string, string> = {
-      easy: "初級",
-      medium: "中級",
-      hard: "上級",
-    }
-    return labels[difficulty] || difficulty
+    // ...
   }
 
   return (
-    <Card className={cn("animate-fade-in-up", className)}>
-      <CardHeader>
-        <div className="flex items-center gap-2 mb-3">
-          <Badge variant="secondary" className="animate-fade-in">
-            {getCategoryLabel(question.category)}
-          </Badge>
-          <Badge className={cn("animate-fade-in-delay", getDifficultyColor(question.difficulty))}>
-            {getDifficultyLabel(question.difficulty)}
-          </Badge>
-        </div>
-        <CardTitle className="text-xl text-balance leading-relaxed">{question.question}</CardTitle>
+    // ★★★ 変更点：Cardのデザインをシンプルに ★★★
+    <div className={cn("bg-transparent border-none shadow-none", className)}>
+      <CardHeader className="text-center px-0">
+        {/* ★★★ 変更点：問題文を大きく、中央揃えに ★★★ */}
+        <CardTitle className="text-2xl md:text-3xl text-foreground font-bold text-balance leading-relaxed">
+          {question.question}
+        </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
-        {/* ★★★ 変更点：4択問題の表示のみに修正 ★★★ */}
+      <CardContent className="space-y-4 pt-4 px-0">
+        {/* ★★★ 変更点：選択肢を2x2のグリッドレイアウトに ★★★ */}
         {question.options && (
-          <div className="grid gap-3">
+          <div className="grid grid-cols-2 gap-4">
             {question.options.map((option, index) => {
               const isSelected = selectedAnswer === option
               const isCorrect = option === question.answer
@@ -81,53 +55,42 @@ export function QuestionDisplay({
               return (
                 <Button
                   key={index}
-                  variant={isSelected ? "default" : "outline"}
+                  // ★★★ 変更点：ボタンの見た目を大きく変更 ★★★
+                  variant="outline"
                   className={cn(
-                    "justify-start text-left h-auto p-4 whitespace-normal transition-all duration-200 hover:scale-[1.02] group",
-                    showExplanation && isCorrect && "bg-green-50 border-green-200 text-green-800 hover:bg-green-50",
-                    isIncorrect && "bg-red-50 border-red-200 text-red-800 hover:bg-red-50",
-                    !showExplanation && "hover:shadow-md",
+                    "h-28 md:h-32 text-lg md:text-xl font-bold whitespace-normal transition-all duration-200 shadow-md",
+                    "bg-card border-border hover:bg-accent text-card-foreground font-serif", // フォントを明朝体に
+                    isSelected && !showExplanation && "ring-2 ring-primary border-primary",
+                    showExplanation && isCorrect && "!bg-primary !text-primary-foreground !border-primary",
+                    showExplanation && !isCorrect && "bg-muted text-muted-foreground",
+                    isIncorrect && "!bg-destructive/20 !text-destructive !border-destructive/50",
                   )}
                   onClick={() => !showExplanation && onAnswerSelect(option)}
                   disabled={showExplanation}
                 >
-                  <div className="flex items-center gap-3 w-full">
-                    <span className="font-medium text-sm bg-muted rounded-full w-6 h-6 flex items-center justify-center group-hover:bg-primary/10 transition-colors">
-                      {String.fromCharCode(65 + index)}
-                    </span>
-                    <span className="flex-1">{option}</span>
-                    {showExplanation && isCorrect && <CheckCircle className="w-5 h-5 text-green-600 animate-fade-in" />}
-                    {isIncorrect && <XCircle className="w-5 h-5 text-red-600 animate-fade-in" />}
-                  </div>
+                  {option}
                 </Button>
               )
             })}
           </div>
         )}
 
-        {/* Explanation */}
+        {/* Explanation (解説部分のデザインも少し調整) */}
         {showExplanation && (
-          <Card className="bg-gradient-to-br from-muted/50 to-muted animate-fade-in-up border-l-4 border-l-primary/30">
+          <Card className="bg-accent/50 animate-fade-in-up mt-6!">
             <CardContent className="p-4">
               <div className="flex items-start gap-3">
-                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Info className="w-4 h-4 text-primary" />
-                </div>
+                <Info className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                 <div className="flex-1">
-                  <h4 className="font-semibold mb-2 text-primary">解説</h4>
-                  <p className="text-sm text-muted-foreground leading-relaxed mb-3">{question.explanation}</p>
-                  <div className="flex items-center gap-2 text-sm">
-                    <span className="font-medium">正解:</span>
-                    <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      {question.answer}
-                    </Badge>
-                  </div>
+                  <h4 className="font-bold mb-1 text-primary">解説</h4>
+                  <p className="text-sm text-muted-foreground leading-relaxed font-sans">{question.explanation}</p>
                 </div>
               </div>
             </CardContent>
           </Card>
         )}
       </CardContent>
-    </Card>
+    </div>
   )
 }
+
