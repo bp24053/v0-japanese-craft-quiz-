@@ -1,3 +1,4 @@
+//components>quiz>score-submission-dialog.tsx
 "use client"
 
 import { useState } from "react"

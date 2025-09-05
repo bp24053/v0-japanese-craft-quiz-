@@ -70,22 +70,8 @@ export function QuestionDisplay({
         <CardTitle className="text-xl text-balance leading-relaxed">{question.question}</CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
-        {/* Image for image-based questions */}
-        {question.format === "image_based" && question.imageUrl && (
-          <div className="flex justify-center mb-6">
-            <div className="relative group">
-              <img
-                src={question.imageUrl || "/placeholder.svg?height=300&width=400&query=traditional Japanese craft"}
-                alt="Question image"
-                className="max-w-md rounded-lg border shadow-md group-hover:shadow-lg transition-shadow duration-300"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/10 to-transparent rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            </div>
-          </div>
-        )}
-
-        {/* Multiple Choice Questions */}
-        {question.format === "multiple_choice" && question.options && (
+        {/* ★★★ 変更点：4択問題の表示のみに修正 ★★★ */}
+        {question.options && (
           <div className="grid gap-3">
             {question.options.map((option, index) => {
               const isSelected = selectedAnswer === option
@@ -119,39 +105,6 @@ export function QuestionDisplay({
           </div>
         )}
 
-        {/* True/False Questions */}
-        {question.format === "true_false" && (
-          <div className="grid grid-cols-2 gap-4">
-            {["true", "false"].map((option) => {
-              const isSelected = selectedAnswer === option
-              const isCorrect = option === question.answer
-              const isIncorrect = showExplanation && isSelected && !isCorrect
-              const label = option === "true" ? "○ 正しい" : "× 間違い"
-
-              return (
-                <Button
-                  key={option}
-                  variant={isSelected ? "default" : "outline"}
-                  className={cn(
-                    "h-16 text-lg transition-all duration-200 hover:scale-105 group",
-                    showExplanation && isCorrect && "bg-green-50 border-green-200 text-green-800 hover:bg-green-50",
-                    isIncorrect && "bg-red-50 border-red-200 text-red-800 hover:bg-red-50",
-                    !showExplanation && "hover:shadow-md",
-                  )}
-                  onClick={() => !showExplanation && onAnswerSelect(option)}
-                  disabled={showExplanation}
-                >
-                  <div className="flex items-center gap-2">
-                    {label}
-                    {showExplanation && isCorrect && <CheckCircle className="w-5 h-5 text-green-600 animate-fade-in" />}
-                    {isIncorrect && <XCircle className="w-5 h-5 text-red-600 animate-fade-in" />}
-                  </div>
-                </Button>
-              )
-            })}
-          </div>
-        )}
-
         {/* Explanation */}
         {showExplanation && (
           <Card className="bg-gradient-to-br from-muted/50 to-muted animate-fade-in-up border-l-4 border-l-primary/30">
@@ -166,11 +119,7 @@ export function QuestionDisplay({
                   <div className="flex items-center gap-2 text-sm">
                     <span className="font-medium">正解:</span>
                     <Badge variant="secondary" className="bg-green-100 text-green-800">
-                      {question.format === "true_false"
-                        ? question.answer === "true"
-                          ? "○ 正しい"
-                          : "× 間違い"
-                        : question.answer}
+                      {question.answer}
                     </Badge>
                   </div>
                 </div>

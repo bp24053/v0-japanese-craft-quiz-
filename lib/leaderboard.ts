@@ -1,3 +1,4 @@
+//lib>leaderboard.ts
 import type { LeaderboardEntry } from "@/types/quiz"
 
 const LEADERBOARD_KEY = "quizLeaderboard"

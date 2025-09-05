@@ -1,3 +1,4 @@
+//components>quiz>quiz-navigation.tsx
 "use client"
 
 import { Button } from "@/components/ui/button"

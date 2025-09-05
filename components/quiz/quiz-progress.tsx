@@ -1,3 +1,4 @@
+//components>quiz>quiz-progress.tsx
 import { cn } from "@/lib/utils"
 
 interface QuizProgressProps {

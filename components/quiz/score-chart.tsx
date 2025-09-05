@@ -1,3 +1,4 @@
+//components>quiz>score-chart.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import type { KnowledgeCategory } from "@/types/quiz"
 
