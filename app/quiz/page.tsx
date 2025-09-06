@@ -95,29 +95,50 @@ export default function QuizPage() {
     }
   }
 
-  if (isLoading) { return <div className="min-h-screen bg-card flex items-center justify-center font-serif"><p className="text-lg">クイズを準備中...</p></div> }
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-card flex items-center justify-center font-serif">
+        <p className="text-lg">クイズを準備中...</p>
+      </div>
+    )
+  }
+
   if (error) {
     return (
       <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif">
         <Card className="w-full max-w-md bg-background">
-          <CardHeader><CardTitle className="text-destructive">エラーが発生しました</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-destructive">エラーが発生しました</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-center">{error}</p>
             <div className="flex gap-4 justify-center">
               <Button onClick={() => window.location.reload()}>再試行</Button>
-              <Link href="/genre-selection"><Button variant="outline">ジャンル選択に戻る</Button></Link>
+              <Link href="/genre-selection">
+                <Button variant="outline">ジャンル選択に戻る</Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
       </div>
     )
   }
-  if (!session) { return <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif"><p>セッションを開始できませんでした。</p></div> }
+  
+  if (!session) {
+      return (
+          <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif">
+             <p>セッションを開始できませんでした。</p>
+         </div>
+      )
+  }
+
   if (isQuizComplete) {
     return (
       <div className="min-h-screen bg-card flex items-center justify-center p-4 font-serif">
         <Card className="w-full max-w-md text-center bg-background">
-          <CardHeader><CardTitle className="text-2xl text-primary">クイズ完了！</CardTitle></CardHeader>
+          <CardHeader>
+            <CardTitle className="text-2xl text-primary">クイズ完了！</CardTitle>
+          </CardHeader>
           <CardContent className="space-y-4">
             <p className="text-lg">お疲れ様でした！</p>
             <Button onClick={() => router.push("/results")}>結果を見る</Button>
@@ -130,28 +151,29 @@ export default function QuizPage() {
   const currentQuestion = session.questions[session.currentQuestionIndex]
 
   return (
+    // ★★★ 変更点：背景と全体のレイアウトを調整 ★★★
     <div className="min-h-screen bg-card flex flex-col font-serif">
-      {/* ★★★ 変更点：ヘッダーに終了ボタンを追加 ★★★ */}
-      <header className="py-4 px-4">
-        <div className="container mx-auto flex justify-between items-center">
-            <div className="w-1/3"></div> {/* 左側のスペース確保用 */}
-            <div className="w-1/3 text-center">
-                <h1 className="text-2xl font-bold tracking-widest text-foreground">クイズ</h1>
-            </div>
-            <div className="w-1/3 flex justify-end">
-                <Link href="/genre-selection">
-                    <Button variant="outline" size="sm">終了</Button>
-                </Link>
-            </div>
-        </div>
-        <p className="text-xs text-muted-foreground text-center mt-1">正解数に応じてランクアップ！</p>
+      <header className="py-4 px-4 text-center">
+        <h1 className="text-2xl font-bold tracking-widest text-foreground">クイズ</h1>
+        <p className="text-xs text-muted-foreground">正解数に応じてランクアップ！</p>
       </header>
 
       <main className="container mx-auto px-4 py-8 flex-1 flex flex-col justify-center">
         <div className="max-w-md mx-auto w-full">
-          <QuizProgress current={session.currentQuestionIndex + 1} total={session.questions.length} className="mb-8" />
-          <QuestionDisplay question={currentQuestion} selectedAnswer={selectedAnswer} onAnswerSelect={handleAnswerSelect} showExplanation={showExplanation} className="mb-8" />
+          <QuizProgress
+            current={session.currentQuestionIndex + 1}
+            total={session.questions.length}
+            className="mb-8"
+          />
+          <QuestionDisplay
+            question={currentQuestion}
+            selectedAnswer={selectedAnswer}
+            onAnswerSelect={handleAnswerSelect}
+            showExplanation={showExplanation}
+            className="mb-8"
+          />
           <QuizNavigation
+            // ★★★ 変更点：「前の問題へ」ボタンを非表示に ★★★
             canGoBack={false}
             canSubmit={selectedAnswer !== null && !showExplanation}
             canNext={showExplanation}
@@ -163,6 +185,7 @@ export default function QuizPage() {
         </div>
       </main>
       
+      {/* ★★★ 目標画像の波模様を簡易的に再現 ★★★ */}
       <footer className="w-full h-20 bg-repeat-x bg-bottom" style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 100 20\'%3E%3Cpath fill=\'%23a0d8ef\' fill-opacity=\'0.3\' d=\'M0 10 Q 25 0, 50 10 T 100 10 L 100 20 L 0 20 Z\'%3E%3C/path%3E%3Cpath fill=\'%23a0d8ef\' fill-opacity=\'0.6\' d=\'M0 15 Q 25 5, 50 15 T 100 15 L 100 20 L 0 20 Z\'%3E%3C/path%3E%3C/svg%3E")'}}>
       </footer>
     </div>

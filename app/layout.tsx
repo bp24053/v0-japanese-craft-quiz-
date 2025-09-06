@@ -14,7 +14,6 @@ const notoSerifJp = Noto_Serif_JP({
 export const metadata: Metadata = {
   title: '伝統工芸品クイズ', // タイトルも変更
   description: '日本の美しい伝統工芸品について学ぼう',
-  generator: 'v0.app',
 }
 
 export default function RootLayout({
@@ -24,7 +23,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ja"> {/* langを日本語に */}
-      {/* ★★★ 変更点：フォント変数を追加 ★★★ */}
+      {/* ★★★ 変更点：フォント変数を追加し、font-serifを適用 ★★★ */}
       <body className={`font-serif ${GeistSans.variable} ${notoSerifJp.variable}`}>
         {children}
         <Analytics />
@@ -32,3 +31,4 @@ export default function RootLayout({
     </html>
   )
 }
+

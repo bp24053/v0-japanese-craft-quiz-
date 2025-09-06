@@ -22,16 +22,35 @@ export function QuestionDisplay({
   showExplanation,
   className,
 }: QuestionDisplayProps) {
-  // These helper functions can remain as they are, but are not used in the new design.
-  // You can keep them for future reference or remove them.
+  // These helper functions are not used in the new design, but kept for potential future use.
   const getDifficultyColor = (difficulty: string) => {
-    // ...
+    switch (difficulty) {
+      case "easy": return "bg-green-100 text-green-800 border-green-200"
+      case "medium": return "bg-yellow-100 text-yellow-800 border-yellow-200"
+      case "hard": return "bg-red-100 text-red-800 border-red-200"
+      default: return "bg-gray-100 text-gray-800"
+    }
   }
+
   const getCategoryLabel = (category: string) => {
-    // ...
+    const labels: Record<string, string> = {
+      history: "歴史・人物",
+      geography: "地理・産地",
+      materials: "材料・技法",
+      usage: "用途・文化背景",
+      design: "意匠・デザイン",
+      trivia: "豆知識・現代との関わり",
+    }
+    return labels[category] || category
   }
+
   const getDifficultyLabel = (difficulty: string) => {
-    // ...
+    const labels: Record<string, string> = {
+      easy: "初級",
+      medium: "中級",
+      hard: "上級",
+    }
+    return labels[difficulty] || difficulty
   }
 
   return (
