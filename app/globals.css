@@ -1,3 +1,6 @@
+/* ★★★ 変更点：@importをファイルの先頭に移動 ★★★ */
+@import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,7 +17,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 35 25% 30%;
 
-    --primary: 195 53% 65%;       /* クイズ画面の水色（変更なし） */
+    --primary: 195 53% 65%;        /* クイズ画面の水色（変更なし） */
     --primary-foreground: 210 40% 98%;
 
     --secondary: 45 30% 90%;       /* ホームボタンなどの薄いクリーム色 */
@@ -36,9 +39,7 @@
     --radius: 0.75rem;
   }
 
-  .dark {
-    /* ダークモードは省略 */
-  }
+  /* ★★★ 変更点：空の.darkルールセットを削除 ★★★ */
 }
 
 @layer base {
@@ -46,7 +47,7 @@
     @apply border-border;
   }
   body {
+    /* ★★★ 変更点：重複するfont-family指定を削除（Tailwindのfont-serifクラスで適用） ★★★ */
     @apply bg-background text-foreground;
   }
 }
-

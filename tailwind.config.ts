@@ -17,10 +17,10 @@ const config = {
       },
     },
     extend: {
-      // ★★★ 変更点：新しいフォントファミリーを追加 ★★★
+      // ★★★ 変更点：serifのフォントファミリーをHina Minchoの変数に変更 ★★★
       fontFamily: {
         sans: ["var(--font-geist-sans)"],
-        serif: ["var(--font-noto-serif-jp)"], // 新しい明朝体
+        serif: ["var(--font-hina-mincho)"], // Hina Minchoを使用
       },
       colors: {
         border: "hsl(var(--border))",
@@ -82,4 +82,3 @@ const config = {
 } satisfies Config
 
 export default config
-

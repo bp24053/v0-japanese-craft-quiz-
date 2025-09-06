@@ -7,7 +7,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Home } from "lucide-react";
 import type { GenreKey } from "@/types/quiz";
-
 export default function CraftsByGenrePage() {
     const params = useParams();
     const genreKey = params.genreKey as GenreKey;
