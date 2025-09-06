@@ -41,7 +41,7 @@ export default function CraftsByGenrePage() {
                     <div className="w-1/4"></div>
                     <h1 className="text-3xl font-bold w-1/2">{displayName}</h1>
                     <div className="w-1/4 flex justify-end">
-                        <Link href="https://homepage-kappa-lemon.vercel.app/</div>"><Button variant="secondary" size="sm" className="rounded-full shadow-sm"><Home className="w-4 h-4 mr-1" />ホーム</Button></Link>
+                        <Link href="https://homepage-kappa-lemon.vercel.app/"><Button variant="secondary" size="sm" className="rounded-full shadow-sm"><Home className="w-4 h-4 mr-1" />ホーム</Button></Link>
                     </div>
                 </div>
             </header>
