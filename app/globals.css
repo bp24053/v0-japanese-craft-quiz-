@@ -1,4 +1,4 @@
-/* ★★★ 変更点：@importをファイルの先頭に移動 ★★★ */
+/*app>globals.css*/
 @import url('https://fonts.googleapis.com/css2?family=Hina+Mincho&display=swap');
 
 @tailwind base;

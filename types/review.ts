@@ -1,3 +1,4 @@
+/// types/review.ts
 export interface Reply {
     id: string;
     author: string;

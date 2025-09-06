@@ -1,3 +1,4 @@
+/// app/reviews/page.tsx
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { GENRE_CATEGORIES } from "@/lib/quiz-data";
 import Link from "next/link";

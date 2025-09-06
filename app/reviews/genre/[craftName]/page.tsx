@@ -1,3 +1,4 @@
+/// app/reviews/genre/[craftName]/page.tsx
 "use client"
 
 import { useState } from "react";
