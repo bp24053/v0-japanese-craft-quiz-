@@ -1,254 +1,132 @@
-//app>results>page.tsx
 "use client"
 
 import { useEffect, useState } from "react"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { ScoreChart } from "@/components/quiz/score-chart"
-import { CategoryBreakdown } from "@/components/quiz/category-breakdown"
-import { ScoreSubmissionDialog } from "@/components/quiz/score-submission-dialog"
 import type { QuizQuestion, KnowledgeCategory } from "@/types/quiz"
-import { getRank, isTopScore } from "@/lib/leaderboard"
 import Link from "next/link"
-import { Trophy, RotateCcw, Award } from "lucide-react"
+import { useRouter } from "next/navigation"
+
+// 新しく作成した部品をインポート
+import { ScoreDonutChart } from "@/components/quiz/ScoreDonutChart"
+import { AffectionRank } from "@/components/quiz/AffectionRank"
+import { CategoryBreakdown } from "@/components/quiz/category-breakdown"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge"
 
 interface QuizResults {
-  sessionId: string
-  totalQuestions: number
-  correctAnswers: number
   accuracy: number
   completionTime: number
   categoryBreakdown: Record<KnowledgeCategory, { correct: number; total: number }>
   questions: QuizQuestion[]
   answers: (string | null)[]
-  startTime: string
-  endTime: string
 }
 
 export default function ResultsPage() {
   const [results, setResults] = useState<QuizResults | null>(null)
-  const [showSubmissionDialog, setShowSubmissionDialog] = useState(false)
-  const [currentRank, setCurrentRank] = useState<number | null>(null)
-  const [isNewTopScore, setIsNewTopScore] = useState(false)
+  const [showDetails, setShowDetails] = useState(false) // ★★★ 詳細表示を管理する新しいState
 
   useEffect(() => {
     const storedResults = localStorage.getItem("quizResults")
     if (storedResults) {
-      const parsedResults = JSON.parse(storedResults)
-      setResults(parsedResults)
-
-      // Calculate rank and check if it's a top score
-      const rank = getRank(parsedResults.accuracy, parsedResults.completionTime)
-      const topScore = isTopScore(parsedResults.accuracy, parsedResults.completionTime)
-
-      setCurrentRank(rank)
-      setIsNewTopScore(topScore)
-
-      // Show submission dialog for good scores (top 10 or accuracy >= 70%)
-      if (rank <= 10 || parsedResults.accuracy >= 70) {
-        setShowSubmissionDialog(true)
-      }
+      setResults(JSON.parse(storedResults))
     }
   }, [])
 
   if (!results) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card>
-          <CardContent className="p-6">
-            <p className="text-center">結果を読み込み中...</p>
-            <div className="mt-4 text-center">
-              <Link href="/">
-                <Button variant="outline">ホームに戻る</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-card flex items-center justify-center font-serif">
+        <p>結果を読み込み中...</p>
       </div>
     )
   }
-
-  const getScoreGrade = (accuracy: number) => {
-    if (accuracy >= 90) return { grade: "S", color: "text-yellow-600", bg: "bg-yellow-100" }
-    if (accuracy >= 80) return { grade: "A", color: "text-green-600", bg: "bg-green-100" }
-    if (accuracy >= 70) return { grade: "B", color: "text-blue-600", bg: "bg-blue-100" }
-    if (accuracy >= 60) return { grade: "C", color: "text-orange-600", bg: "bg-orange-100" }
-    return { grade: "D", color: "text-red-600", bg: "bg-red-100" }
+  
+  // ★★★ 愛着度ランクを計算するロジック ★★★
+  const getAffectionRank = (accuracy: number): number => {
+    if (accuracy >= 90) return 5
+    if (accuracy >= 70) return 4
+    if (accuracy >= 50) return 3
+    if (accuracy >= 30) return 2
+    return 1
   }
 
-  const formatTime = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}分${remainingSeconds}秒`
-  }
-
-  const scoreGrade = getScoreGrade(results.accuracy)
+  const affectionRank = getAffectionRank(results.accuracy); 
+  // 仮のポイント計算ロジック（後でより複雑にすることも可能）
+  const totalPoints = Math.round(results.accuracy + (affectionRank * 10));
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b border-border bg-card">
-        <div className="container mx-auto px-4 py-6">
-          <h1 className="text-3xl font-bold text-foreground text-center">クイズ結果</h1>
-        </div>
+    <div className="min-h-screen bg-card flex flex-col font-serif p-4">
+      <header className="text-center py-6">
+        <h1 className="text-3xl font-bold">クイズ結果</h1>
+        <p className="text-muted-foreground mt-1">あなたの推し理解度は...</p>
       </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto space-y-8">
-          {/* New Top Score Banner */}
-          {isNewTopScore && (
-            <Card className="border-yellow-200 bg-yellow-50">
-              <CardContent className="p-6">
-                <div className="flex items-center justify-center gap-2 text-yellow-800">
-                  <Award className="w-6 h-6" />
-                  <span className="text-lg font-bold">新記録達成！おめでとうございます！</span>
-                </div>
-              </CardContent>
-            </Card>
-          )}
+      <main className="flex-1 flex flex-col items-center justify-center">
+        <ScoreDonutChart accuracy={results.accuracy} />
 
-          {/* Overall Score */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Trophy className="w-5 h-5 text-primary" />
-                総合結果
-                {currentRank && (
-                  <Badge variant="secondary" className="ml-auto">
-                    ランキング {currentRank}位
-                  </Badge>
-                )}
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="grid md:grid-cols-4 gap-6">
-                <div className="text-center">
-                  <div
-                    className={`inline-flex items-center justify-center w-16 h-16 rounded-full text-2xl font-bold ${scoreGrade.bg} ${scoreGrade.color} mb-2`}
-                  >
-                    {scoreGrade.grade}
-                  </div>
-                  <p className="text-sm text-muted-foreground">総合評価</p>
-                </div>
+        <div className="grid grid-cols-2 gap-8 w-full max-w-sm mt-8">
+            <AffectionRank rank={affectionRank} />
+            <div className="flex flex-col items-center justify-center">
+                 <div className="w-32 h-32 rounded-full border-4 border-gray-400 flex items-center justify-center">
+                     <span className="text-4xl font-bold text-foreground font-serif">{totalPoints}</span>
+                 </div>
+                 <p className="mt-2 text-sm font-bold text-foreground">総獲得ポイント</p>
+            </div>
+        </div>
 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">
-                    {results.correctAnswers}/{results.totalQuestions}
-                  </div>
-                  <p className="text-sm text-muted-foreground">正解数</p>
-                </div>
+        <div className="bg-background/80 p-4 rounded-lg mt-8 text-center max-w-sm">
+            <p className="text-sm">
+                あなたはこの伝統品について {Math.round(results.accuracy)}% 理解していました。すばらしい！
+                愛着度ランクをどんどん上げて、抽選の当選率を高めよう！
+            </p>
+        </div>
+      </main>
 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">{Math.round(results.accuracy)}%</div>
-                  <p className="text-sm text-muted-foreground">正答率</p>
-                </div>
+      {/* ★★★ 変更点：ボタンレイアウトと「詳細」ボタンの追加 ★★★ */}
+      <footer className="w-full max-w-sm mx-auto flex flex-col gap-3 pb-4">
+        <Button onClick={() => setShowDetails(!showDetails)} variant="secondary">
+          {showDetails ? "詳細を隠す" : "詳しい結果を見る"}
+        </Button>
+        <div className="grid grid-cols-2 gap-2">
+            <Link href="/quiz">
+              <Button variant="outline" className="w-full">もう一度挑戦</Button>
+            </Link>
+            <Link href="/leaderboard">
+              <Button variant="outline" className="w-full">ランキング</Button>
+            </Link>
+        </div>
+        <Link href="/genre-selection">
+            <Button className="w-full">他の伝統品のクイズをする</Button>
+        </Link>
+      </footer>
 
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-primary mb-1">{formatTime(results.completionTime)}</div>
-                  <p className="text-sm text-muted-foreground">所要時間</p>
-                </div>
-              </div>
-
-              <div className="mt-6">
-                <div className="flex justify-between text-sm mb-2">
-                  <span>正答率</span>
-                  <span>{Math.round(results.accuracy)}%</span>
-                </div>
-                <Progress value={results.accuracy} className="h-3" />
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Category Breakdown */}
+      {/* ★★★ 変更点：詳細表示エリア ★★★ */}
+      {showDetails && (
+        <div className="w-full max-w-4xl mx-auto my-8 space-y-8 animate-fade-in">
           <CategoryBreakdown categoryBreakdown={results.categoryBreakdown} />
-
-          {/* Performance Chart */}
-          <ScoreChart results={results} />
-
-          {/* Detailed Review */}
           <Card>
-            <CardHeader>
-              <CardTitle>問題別詳細</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle>問題別詳細</CardTitle></CardHeader>
             <CardContent>
               <div className="space-y-4">
                 {results.questions.map((question, index) => {
-                  const userAnswer = results.answers[index]
-                  const isCorrect = userAnswer === question.answer
-
+                  const userAnswer = results.answers[index];
+                  const isCorrect = userAnswer === question.answer;
                   return (
-                    <div key={question.id} className="border rounded-lg p-4">
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline">問題 {index + 1}</Badge>
-                          <Badge className={isCorrect ? "bg-green-100 text-green-800" : "bg-red-100 text-red-800"}>
-                            {isCorrect ? "正解" : "不正解"}
-                          </Badge>
-                        </div>
-                      </div>
-
-                      <h4 className="font-medium mb-2 text-balance">{question.question}</h4>
-
-                      <div className="grid md:grid-cols-2 gap-4 text-sm">
-                        <div>
-                          <span className="font-medium">あなたの回答: </span>
-                          <span className={isCorrect ? "text-green-600" : "text-red-600"}>
-                            {userAnswer || "未回答"}
-                          </span>
-                        </div>
-                        <div>
-                          <span className="font-medium">正解: </span>
-                          <span className="text-green-600">{question.answer}</span>
-                        </div>
-                      </div>
-
-                      {!isCorrect && (
-                        <div className="mt-3 p-3 bg-muted rounded">
-                          <p className="text-sm text-muted-foreground">
-                            <span className="font-medium">解説: </span>
-                            {question.explanation}
-                          </p>
-                        </div>
-                      )}
+                    <div key={question.id} className="border rounded-lg p-4 bg-background/50">
+                      <h4 className="font-bold mb-2">問題 {index + 1}: {question.question}</h4>
+                      <p className={isCorrect ? "text-green-600 font-bold" : "text-red-600 font-bold"}>
+                        あなたの回答: {userAnswer || "未回答"} {isCorrect ? " (正解)" : `(不正解)`}
+                      </p>
+                      {!isCorrect && <p className="text-green-700 font-bold">正解: {question.answer}</p>}
+                      <p className="text-xs text-muted-foreground mt-2 font-sans">{question.explanation}</p>
                     </div>
-                  )
+                  );
                 })}
               </div>
             </CardContent>
           </Card>
-
-          {/* Actions */}
-          <div className="flex gap-4 justify-center">
-            <Link href="/leaderboard">
-              <Button variant="secondary" className="flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                ランキングを見る
-              </Button>
-            </Link>
-            <Link href="/quiz">
-              <Button className="flex items-center gap-2">
-                <RotateCcw className="w-4 h-4" />
-                もう一度挑戦
-              </Button>
-            </Link>
-            <Link href="/">
-              <Button variant="outline">ホームに戻る</Button>
-            </Link>
-          </div>
         </div>
-      </main>
-
-      {/* Score Submission Dialog */}
-      <ScoreSubmissionDialog
-        open={showSubmissionDialog}
-        onOpenChange={setShowSubmissionDialog}
-        results={results}
-        currentRank={currentRank}
-        isTopScore={isNewTopScore}
-      />
+      )}
     </div>
   )
 }
+
