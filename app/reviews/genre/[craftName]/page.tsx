@@ -60,7 +60,7 @@ export default function CraftReviewPage() {
                     <div className="w-1/4"></div>
                     <h1 className="text-3xl font-bold w-1/2">伝統品愛好会</h1>
                     <div className="w-1/4 flex justify-end">
-                        <Link href="/"><Button variant="secondary" size="sm" className="rounded-full shadow-sm"><Home className="w-4 h-4 mr-1" />ホーム</Button></Link>
+                        <Link href="https://homepage-kappa-lemon.vercel.app/</div>"><Button variant="secondary" size="sm" className="rounded-full shadow-sm"><Home className="w-4 h-4 mr-1" />ホーム</Button></Link>
                     </div>
                 </div>
                 <div className="container mx-auto mt-4 px-4">
