@@ -25,8 +25,12 @@ export function ReviewCard({ review, onLike }: ReviewCardProps) {
             <div className="flex-1">
                 <div className="bg-muted p-3 rounded-lg rounded-tl-none relative">
                     <div className="absolute left-[-10px] top-0 w-0 h-0 border-t-[10px] border-t-transparent border-r-[10px] border-r-muted"></div>
-                    <p className="font-bold text-sm text-foreground">{review.author}</p>
-                    <p className="text-foreground mt-1 whitespace-pre-wrap text-sm leading-relaxed">{review.content}</p>
+                     <p className="font-bold text-sm text-foreground mb-1">
+                       {review.author}
+                    </p>
+                    <p className="text-foreground mt-1 whitespace-pre-wrap text-base leading-relaxed">
+                      {review.content}
+                    </p>
                     {review.imageUrl && ( <img src={review.imageUrl} alt="投稿画像" className="mt-2 rounded-lg max-h-60 w-auto" /> )}
                 </div>
                 <div className="flex items-center gap-2 mt-1 text-muted-foreground">

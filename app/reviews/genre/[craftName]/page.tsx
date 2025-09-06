@@ -58,17 +58,26 @@ export default function CraftReviewPage() {
             <header className="text-center py-4 sticky top-0 bg-background/90 backdrop-blur-sm z-10 border-b">
                 <div className="container mx-auto flex items-center justify-between px-4">
                     <div className="w-1/4"></div>
-                    <h1 className="text-3xl font-bold w-1/2">伝統品愛好会</h1>
+                    <h1 className="hina-mincho hina-mincho-bold text-3xl w-1/2">伝統品愛好会</h1>
                     <div className="w-1/4 flex justify-end">
                         <Link href="https://homepage-kappa-lemon.vercel.app/"><Button variant="secondary" size="sm" className="rounded-full shadow-sm"><Home className="w-4 h-4 mr-1" />ホーム</Button></Link>
                     </div>
                 </div>
-                <div className="container mx-auto mt-4 px-4">
-                    <p className="text-sm text-muted-foreground flex items-center justify-center gap-1"><Heart className="w-3 h-3 text-pink-400" />いいねを獲得して推しのランキングUPを狙おう！</p>
-                    <h2 className="text-2xl font-bold mt-2 text-foreground flex items-center justify-center gap-2">
-                        推し伝統品 <span className="text-primary">{craftName}</span>
-                    </h2>
-                </div>
+                <main className="container mx-auto px-4 py-8">
+ <div className="flex border-b pb-1 mb-8 items-end">
+  <div className="flex items-baseline mr-6">
+    <span className="hina-mincho hina-mincho-bold text-5xl leading-none">推</span>
+    <span className="hina-mincho text-xs ml-2">し伝統品</span>
+  </div>
+  <div className="flex-1 flex items-end justify-center">
+    <span className="hina-mincho hina-mincho-bold text-4xl">{craftName}</span>
+  </div>
+  <div className="flex items-end justify-end ml-4">
+    <span className="hina-mincho text-2xl pb-1">▼</span>
+  </div>
+</div>
+                  {/* 口コミ一覧など... */}
+                </main>
             </header>
 
             <main className="flex-1 p-4 space-y-4 bg-white">

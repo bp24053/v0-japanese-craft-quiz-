@@ -50,3 +50,17 @@
   }
 }
 
+@font-face {
+  font-family: 'Hina Mincho';
+  src: url('/fonts/HinaMincho-Regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+hina-mincho {
+  font-family: 'Hina Mincho', serif;
+}
+.hina-mincho-bold {
+  font-family: 'Hina Mincho', serif;
+  font-weight: normal;
+  text-shadow: 0.5px 0 0 currentColor, -0.5px 0 0 currentColor;
+}
