@@ -52,13 +52,15 @@
 
 @font-face {
   font-family: 'Hina Mincho';
-  src: url('/fonts/HinaMincho-Regular.woff2') format('woff2');
+  src: url('/fonts/HinaMincho-Regular.ttf') format('truetype');
   font-weight: normal;
   font-style: normal;
 }
-hina-mincho {
+
+.hina-mincho {
   font-family: 'Hina Mincho', serif;
 }
+
 .hina-mincho-bold {
   font-family: 'Hina Mincho', serif;
   font-weight: normal;
