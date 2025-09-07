@@ -107,7 +107,7 @@ export default function CraftReviewPage() {
     <span className="hina-mincho text-2xl ml-2">し伝統品</span>
   </div>
   <div className="flex-1 flex items-end justify-center">
-    <span className="hina-mincho hina-mincho-bold text-4xl">{craftName}</span>
+    <span className="hina-mincho hina-mincho-bold text-2xl">{craftName}</span>
   </div>
   <div className="flex items-end justify-end ml-4">
     <span className="hina-mincho hina-mincho-bold text-2xl pb-1">▼</span>
