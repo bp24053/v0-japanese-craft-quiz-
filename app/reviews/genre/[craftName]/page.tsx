@@ -16,7 +16,7 @@ const initialDummyReviews: Review[] = [
     id: '1',
     author: '41歳・主婦',
     content: '最近、旅先でふらっと立ち寄った窯元で一目惚れした小皿を買ってから有田焼にはまりました。\n毎日食卓に並べると何気ない料理まで特別に見えて、手に取った時の軽やかさや模様の美しさに惹かれて気づけば毎日眺めてます。',
-    imageUrl: 'https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80',
+    imageUrl: 'https://thvnext.bing.com/th/id/OIP.2sOoAyQ5DaeoYrCJo--W1wHaE7?w=290&h=186&c=7&r=0&o=5&cb=ucfimg2&dpr=1.5&pid=1.7&ucfimg=1',
     likes: 24,
     replies: []
   },
